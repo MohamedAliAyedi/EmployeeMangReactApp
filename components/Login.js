@@ -1,7 +1,6 @@
 import React, { useState }  from 'react';
 import {Button, Text, View, TextInput,TouchableOpacity, TouchableWithoutFeedback, Alert, KeyboardAvoidingView, Picker} from 'react-native';
 import styles from "../style";
-
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
 
@@ -12,21 +11,20 @@ import { createAppContainer } from 'react-navigation';
      
       state = {
           username: '',
-          password: ''
+          password: '',
+          myerror:'',
        }
        setusername = (text) => {
           this.setState({ username: text })
+       }
+       setmyerror = (text) => {
+          this.setState({ myerror: text })
        }
 
        setpassword = (text) => {
           this.setState({ password: text })
        }
     render(){ 
-      const selectedItem = {
-        title: 'Selected item title',
-        description: 'Secondary long descriptive text ...',
-    };
-
         return (
         
           <View style={styles.container}>
@@ -51,11 +49,15 @@ import { createAppContainer } from 'react-navigation';
           <TouchableOpacity>
             <Text style={styles.forgot}>Forgot Password?</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.loginBtn}>
+          <Text style={{color:"red"}}>{this.state.myerror}</Text>
+          <TouchableOpacity 
+          style={styles.loginBtn}
+          onPress={() => this.singin(this.state.username,this.state.password)}          
+          >
             <Text
              style={styles.loginText}
-             onPress={() => this.singin(this.state.username,this.state.password)}
             >LOGIN</Text>
+            
           </TouchableOpacity>
 
   
@@ -69,27 +71,34 @@ import { createAppContainer } from 'react-navigation';
         console.log(username);
         console.log(password);
         if (username && password) { 
-            fetch("http://192.168.56.1:5000/auth", {
-              method: "POST",
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
-      
-              },
-              body: JSON.stringify({
-                username: username,
-                password: password,
+            try {
+              fetch("http://192.168.43.19:5000/auth", {
+                method: "POST",
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                  'Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
+        
+                },
+                body: JSON.stringify({
+                  username: username,
+                  password: password,
+                })
               })
-            })
-            .then((response) => response.json())
-            .then((responseData) =>  console.log(responseData))
-            .then( () => this.props.navigation.navigate( 'Profile', {
-                password: password,
-                uid:2
-              } ) );
+              .then((response) => response.json())
+              .then((responseData) =>  console.log(responseData))
+              .then( () => this.props.navigation.navigate( 'Profile', {
+                  password: password,
+                  uid:2
+                } ) );
+            } catch (error) {
+            }
         }
+        setTimeout( () => {
+          this.setmyerror("Error Email or Password")
+        },2000);
+        
         }
       
 

@@ -5,41 +5,72 @@ const { StyleSheet } = React;
 export default {
   container: {
     flex: 1,
-    backgroundColor: '#003f5c',
+    backgroundColor: '#fffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  box:{
+    marginLeft:20
+  },
+  mycontainer: {
+    flex: 1,
+    backgroundColor: '#fffff',
     alignItems: 'center',
     justifyContent: 'center',
   },
   logo:{
     fontWeight:"bold",
     fontSize:50,
-    color:"#5c70ff",
+    color:"orange",
     marginBottom:40
+  },
+  mytext:{
+    fontWeight: 'bold'
   },
   inputView:{
     width:"80%",
-    backgroundColor:"#465881",
+    backgroundColor:"white",
     borderRadius:25,
     height:50,
     marginBottom:20,
     justifyContent:"center",
-    padding:20
+    padding:20,
+    color:"black"
   },
   inputText:{
     height:50,
-    color:"white"
+    color:"black"
+  },
+  myinputText:{
+    paddingLeft:20,
+    margin:15,
+    height:50,
+    color:"black",
+    backgroundColor:"white"
   },
   forgot:{
-    color:"white",
+    color:"black",
     fontSize:11
   },
   loginBtn:{
     width:"80%",
-    backgroundColor:"#5c70ff",
+    backgroundColor:"orange",
     borderRadius:25,
     height:50,
     alignItems:"center",
     justifyContent:"center",
     marginTop:40,
+    marginBottom:10
+  },
+  myBtn:{
+    width:"20%",
+    backgroundColor:"orange",
+    borderRadius:25,
+    height:50,
+    alignItems:"center",
+    justifyContent:"center",
+    marginTop:40,
+    marginLeft:20,
     marginBottom:10
   },
   loginText:{

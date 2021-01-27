@@ -5,7 +5,6 @@ import Login from './components/Login';
 import Detail from './components/Detail';
 import Update from './components/Update';
 import Create from './components/Create';
-//import Upload from './components/Upload';
 
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
@@ -13,9 +12,18 @@ import { createAppContainer } from 'react-navigation';
 
 const RootStack = createStackNavigator( {
 
-  //UploadImage:Upload,
-  Login: Login,
-  Profile: Profile,
+  Login: { 
+    screen: Login,
+    navigationOptions: {
+      header: null,
+    }
+ },
+ Profile: { 
+    screen: Profile,
+    navigationOptions: {
+      header: null,
+    }
+ },
   Detail: Detail,
   Update: Update,
   Create: Create,

@@ -1,8 +1,7 @@
 import React from 'react';
-import {FlatList, TextInput, Image, Button, StyleSheet, Text, View ,Picker,TouchableOpacity} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { DataTable } from 'react-native-paper';
-
+import {Picker,FlatList, TextInput, Image, Button, StyleSheet, Text, View,ActivityIndicator} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import styles from "../style";
 
 export default class Create extends React.Component {
@@ -11,18 +10,15 @@ export default class Create extends React.Component {
     super(props);
     this.state = { isLoading: true };
   }
-
-
-
-   
-
-
-
-
   componentDidMount(){
+   this.onLoad();
+ } 
+
+
+  onLoad= () =>{
    const password = this.props.navigation.getParam( 'password', 'No password provided' )
    const uid = this.props.navigation.getParam( 'uid', 'No uid provided' )
-      fetch("http://127.0.0.1:5000/api/getDepartement", {method: "POST",headers: {'Accept': 'application/json','Content-Type': 'application/json','Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
+      fetch("http://192.168.43.19:5000/api/getDepartement", {method: "POST",headers: {'Accept': 'application/json','Content-Type': 'application/json','Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
       },
       body: JSON.stringify({
       password: password,
@@ -32,30 +28,35 @@ export default class Create extends React.Component {
       .then(response => response.json())
       .then(responseJson => { this.setState({  DepartementList: responseJson, }, function() {});})
       .catch(error => {console.error(error);});
-      fetch("http://127.0.0.1:5000/api/getJobs", {method: "POST",headers: {'Accept': 'application/json','Content-Type': 'application/json','Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
-      },
-      body: JSON.stringify({
-      password: password,
-      uid: uid,
-      })
-      })
-      .then(response => response.json())
-      .then(responseJson => { this.setState({  JobsList: responseJson, }, function() {});})
-      .catch(error => {
-      console.error(error);
-      });
-      fetch("http://127.0.0.1:5000/api/getCountry", {method: "POST",headers: {'Accept': 'application/json','Content-Type': 'application/json','Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
-      },
-      body: JSON.stringify({
-      password: password,
-      uid: uid,
-      })
-      })
-      .then(response => response.json())
-      .then(responseJson => { this.setState({  CountryList: responseJson, }, function() {});})
-      .catch(error => {
-      console.error(error);
-      });
+      fetch("http://192.168.43.19:5000/api/getJobs", {method: "POST",headers: {'Accept': 'application/json','Content-Type': 'application/json','Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
+            },
+            body: JSON.stringify({
+            password: password,
+            uid: uid,
+            })
+            })
+            .then(response => response.json())
+            .then(responseJson => { this.setState({  JobsList: responseJson, }, function() {});})
+            .catch(error => {
+            console.error(error);
+            });
+      fetch("http://192.168.43.19:5000/api/getCountry", {method: "POST",headers: {'Accept': 'application/json','Content-Type': 'application/json','Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
+               },
+               body: JSON.stringify({
+               password: password,
+               uid: uid,
+               })
+               })
+               .then(response => response.json())
+               .then(responseJson => { this.setState({  CountryList: responseJson, }, function() {});})
+               .catch(error => {
+               console.error(error);
+               });
+               setTimeout(() => {
+                  this.setState({
+                     isLoading: false,
+                  });
+               }, 2500);
 }
 /********************************************** */
   Createnew= () =>{
@@ -64,12 +65,23 @@ export default class Create extends React.Component {
     console.log(password);
     console.log(uid);
     if (uid && password) { 
+      let sourceimage = this.state.myimage.replace('data:image/jpeg;base64,','');
+      console.log(sourceimage);
        fetch("http://192.168.43.19:5000/api/create", {method: "POST",headers: {'Accept': 'application/json','Content-Type': 'application/json','Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'POST,GET,OPTIONS, PUT, DELETE'
           },
           body: JSON.stringify({
-            password: password,
-            uid: uid,
+            password: "password",
+            uid: 2,
+
             name:this.state.username,
+            image:sourceimage,
+            departement:this.state.department_id,
+            job_postion:this.state.job_id,
+            email_work:this.state.work_email,
+            mobile_work:this.state.work_phone,
+            gender: this.state.gender,
+            //address_id: this.state.address_id,
+            
           })
         })
         .then(response => response.json())
@@ -77,14 +89,14 @@ export default class Create extends React.Component {
         .catch(error => {
             console.error(error);
           });
-
+          this.props.navigation.navigate( 'Profile', { password: password, uid:2} );
     }
     };
     
     
     //[selectedImage, setSelectedImage] = React.useState();
     
-  openImagePickerAsync = async () => {
+   openImagePickerAsync = async () => {
       let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
 
       if (permissionResult.granted === false) {
@@ -98,18 +110,21 @@ export default class Create extends React.Component {
       allowsEditing: false,
       aspect: [4,3]
    });
-   //console.log(pickerResult)
+   console.log(pickerResult)
    if (pickerResult.cancelled === true) {
       return;
       }
 
       this.setSelectedImage({ localUri: pickerResult.uri });
+      this.setState(
+         {
+           myimage:pickerResult.uri ,
+         });
 }
-
   /****** States  ******/
   state = {
     username: '',
-    selectedImage: {cancelled: false,uri: "data:image/jpeg;base64,/9j/4AAQ",width: 579,height: 624},
+    selectedImage:'',
     job_id: '',
     department_id: '',
     work_email: '',
@@ -165,93 +180,113 @@ export default class Create extends React.Component {
   
   
   render() {
-    console.log(this.state.DepartementList)
-    console.log(this.state.selectedImage)
+   console.log(this.state.username),
+   console.log(this.state.department_id)
+   console.log(this.state.job_id)
+   console.log(this.state.work_email)
+   console.log(this.state.work_phone)
+    //console.log(this.state.selectedImage)
     return (
-
-      <View>
-          <Image 
+                <View style={styles.mycontainer}>
+            <Image 
                name="myimg"
-               style={{width: 80, height: 80, borderWidth: 1,borderRadius: 60 }}
-               //source={{ uri: this.selectedImage  }}
+               style={{width: 150, height: 150, borderWidth: 1,borderRadius: 80,marginTop:5 }}
+               source={{ uri: this.state.myimage }}
                />
 
                <Button
                title="Pick Image"
                onPress={() =>this.openImagePickerAsync()}
                />
-              <Text> Full Name </Text>
+              <Text style={{marginTop:15,fontWeight: 'bold'}}> Full Name </Text>
               <TextInput placeholder="Username"  placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setusername}/>
 
-              <Text> Post Job: </Text>
+              <Text style={{marginTop:15,fontWeight: 'bold'}}> Post Job: </Text>
+         
               <Picker  
               style={styles.loginFormTextInput}
-              onValueChange={(itemvalue,itemindex)=> this.job_id(itemvalue)} >
-             <Picker.Item label="Default" value="31" />
-             <FlatList
-                  data={this.state.JobsList}
-                  renderItem ={   
-                     ({item}) => ( 
-                        <Picker.Item value={item.id} label={item.name} />
-                        )
-                     }
-                     keyExtractor={({ id }, index) => id} 
-             />
-              </Picker>
-
-              <Text> Depatement: </Text>
+              
+              onValueChange={(itemvalue,itemindex)=> this.setjob_id(itemvalue)} >
+                   <Picker.Item value="0" label="Select Post Job" />
+                   <Picker.Item value="1" label="Chief Executive Officer " />
+                   <Picker.Item value="2" label="Chief Technical Officer " />
+                   <Picker.Item value="3" label="Consultant" />
+                   <Picker.Item value="4" label="Experienced Developer" />
+                   <Picker.Item value="5" label="Human Resources Manager" />
+                   <Picker.Item value="6" label="Marketing and Community Manager" />
+                   <Picker.Item value="7" label="Trainer" />
+                     </Picker>             
+              <Text style={styles.mytext}> Depatement: </Text>
               <Picker  
               style={styles.loginFormTextInput}
               onValueChange={(itemvalue,itemindex)=> this.setdepartment_id(itemvalue)} >
-             <Picker.Item label="Default" value="31" />
-             <FlatList
-                  data={this.state.DepartementList}
-                  renderItem ={   
-                     ({item}) => ( 
-                        <Picker.Item value={item.id} label={item.display_name} />
-                        )
-                     }
-                     keyExtractor={({ id }, index) => id} 
-             />
-              </Picker>
+                   <Picker.Item value="0" label="Select Departement" />
+                   <Picker.Item value="1" label="Administration" />
+                   <Picker.Item value="3" label="Management " />
+                   <Picker.Item value="5" label="Professional Services" />
+                   <Picker.Item value="4" label="Research & Development" />
+                   <Picker.Item value="2" label="Sales" />
+                     </Picker>
+               <View style={{flex: 1, flexDirection: 'row',marginTop:20}}>
+                  <View>
+                     <Text style={styles.mytext}> Email Work: </Text>
+                     <TextInput placeholder="Email Work"  placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setwork_email}/>
+                  </View>
+                  <View style={styles.box}>
+                     <Text style={styles.mytext}> Work Phone: </Text>
+                     <TextInput placeholder="Work Phone"  placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setwork_phone}/>
+                  </View>
+               </View>
 
-              <Text> Email Work: </Text>
-              <TextInput placeholder="Email Work"  placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setwork_email}/>
-              <Text> Work Phone: </Text>
-              <TextInput placeholder="Work Phone"  placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setwork_phone}/>
-              <Text> Adrees Society: </Text>
-              <TextInput placeholder="Adress Company"  placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setaddress_id}/>
-              <Text> Country from : </Text>
-              <Picker  
-              style={styles.loginFormTextInput}
-              onValueChange={(itemvalue,itemindex)=> this.setplace_of_birth(itemvalue)} >
-             <Picker.Item label="Default" value="31" />
-             <FlatList
-                  data={this.state.CountryList}
-                  renderItem ={   
-                     ({item}) => ( 
-                        <Picker.Item value={item.name} label={item.name} />
-                        )
-                     }
-                     keyExtractor={({ id }, index) => id} 
-             />
-              </Picker>
-              <Text> Gender: </Text>
-              <TextInput placeholder="Gender" placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setgender}/>
-              <Text> Birthday:</Text>
-              <TextInput placeholder="Birthday" placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setbirthday}/>
-              <Text> Home Adress:</Text>
-              <TextInput placeholder="Home Adress" placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setaddress_home_id}/>
-              <Text> Degreed:</Text>
-              <TextInput placeholder="Degreed" placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setcertificate}/>
 
-              <Button
-                buttonStyle={styles.loginButton}
-                onPress={() => this.Createnew()}
-                title="Create"
-              />
+               <View style={{flex: 1, flexDirection: 'row',marginTop:20}}>
+                  <View>
+                     <Text style={styles.mytext}> Place Work:</Text>
+                     <TextInput placeholder="adress work" placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.address_id}/>                   
+                 </View>
+                  <View style={styles.box}>
+                     <Text style={styles.mytext}> Country from : </Text>
+                     <TextInput placeholder="Country"  placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setplace_of_birth}/>
+                  </View>
+               </View>
 
-  </View>
+
+               <View style={{flex: 1, flexDirection: 'row',marginTop:20}}>
+                  <View>
+                      <Text style={styles.mytext}> Gender: </Text>
+                      <Picker  
+                          style={styles.loginFormTextInput}
+                            onValueChange={(itemvalue,itemindex)=> this.setgender(itemvalue)} >
+                              <Picker.Item value="male" label="male" />
+                              <Picker.Item value="female" label="female" />
+                        </Picker>
+                 </View>
+                  <View style={styles.box}>
+                       <Text style={styles.mytext}> Home Adress:</Text>
+                       <TextInput placeholder="Home Adress" placeholderColor="#c4c3cb" style={styles.loginFormTextInput}  onChangeText={this.setaddress_home_id}/>
+                  </View>
+               </View>
+
+
+
+
+               <View style={{flex: 1, flexDirection: 'row',marginTop:20}}>
+                  <View>
+                   <Text>Date Birthday</Text>
+                   <input type="date" />
+                 </View>
+                  <View style={styles.box}>
+                     <Button
+                        buttonStyle={styles.loginButton}
+                        onPress={() => this.Createnew()}
+                        title="Create"
+                     />
+                  </View>
+               </View>
+              
+
+         </View>
+
 
     
         );
